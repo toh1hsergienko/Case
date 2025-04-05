@@ -25,15 +25,19 @@ def parse_page(url):
                 timeout=10000
             )
             content = content_element.inner_text().strip()
+            content = ' '.join(content.split())
 
-            # Обработка переносов строк
-            content = ' '.join(content.split()).replace('<br>', '\n')
-
-            return {theme: content}
+            return {
+                "title": theme,
+                "desc": content
+            }
             
         except Exception as e:
             print(f"Ошибка при обработке {url}: {str(e)}")
-            return {}
+            return {
+                "title": "",
+                "desc": ""
+            }
             
         finally:
             browser.close()
@@ -50,7 +54,7 @@ def load_endpoints(json_path):
     
     return endpoints
 
-def process_all_pages(json_path, output_file, max_count:int):
+def process_all_pages(json_path, output_file, max_count=10):
     endpoints = load_endpoints(json_path)[:max_count]
     result = {}
     
@@ -65,9 +69,4 @@ def process_all_pages(json_path, output_file, max_count:int):
     print(f"Успешно обработано {len(endpoints)} страниц. Результат сохранен в {output_file}")
 
 if __name__ == "__main__":
-    # Настройки
-    INPUT_JSON = 'science_vars.json'  # Путь к вашему JSON-файлу
-    OUTPUT_JSON = 'result.json'
-    
-    # Запуск обработки
-    process_all_pages(INPUT_JSON, OUTPUT_JSON, 10)
+    process_all_pages('science_vars.json', 'result.json', 10)
